@@ -1,5 +1,6 @@
 # Uncomment this to pass the first stage
 import socket
+import threading
 
 
 class Request:
@@ -91,6 +92,7 @@ def handle_request(conn, req):
     else:
         fn(req, res)
     conn.send(encode_res(res))
+    conn.close()
 
 
 # setting up routes
@@ -128,11 +130,13 @@ def main():
     #
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
     with server_socket:
-        conn, _ = server_socket.accept()  # wait for client
-        with conn:
-            data = conn.recv(1024)
-            req = parse_req(data)
-            handle_request(conn, req)
+        while True:
+            conn, _ = server_socket.accept()  # wait for client
+            with conn:
+                data = conn.recv(1024)
+                req = parse_req(data)
+                thread = threading.Thread(target=handle_request, args=(conn, req))
+                thread.start()
 
 
 if __name__ == "__main__":
