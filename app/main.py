@@ -26,7 +26,7 @@ def parse_req(data):
 
 
 def encode_res(data: Response) -> bytes:
-    status_line = f"HTTP/1.1 ${data.status}"
+    status_line = f"HTTP/1.1 {data.status}"
     # setup header
     if data.body:
         data.header["Content-Length"] = len(data.body)
