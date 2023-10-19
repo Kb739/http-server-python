@@ -80,11 +80,9 @@ def handle_request(conn, req):
     url = "*" + req.url.rstrip("/")
     fn = m["abs"].get(url, m["rel"].get(url, None))
     if fn == None:
-        path = url
         for i in range(len(url) - 1, 0, -1):
             if url[i] == "/":
-                path = path[:i]
-                fn = m["rel"].get(path)
+                fn = m["rel"].get(url[:i])
                 if fn != None:
                     break
                 continue
