@@ -75,7 +75,9 @@ def post(route):
     return deco
 
 
-def handle_request(conn, req):
+def handle_request(conn):
+    data = conn.recv(1024)
+    req = parse_req(data)
     res = Response("404 Not Found")
     m = method_map[req.method]
     url = "*" + req.url.rstrip("/")
@@ -92,7 +94,6 @@ def handle_request(conn, req):
     else:
         fn(req, res)
     conn.send(encode_res(res))
-    conn.close()
 
 
 # setting up routes
@@ -133,9 +134,7 @@ def main():
         while True:
             conn, _ = server_socket.accept()  # wait for client
             with conn:
-                data = conn.recv(1024)
-                req = parse_req(data)
-                thread = threading.Thread(target=handle_request, args=(conn, req))
+                thread = threading.Thread(target=handle_request, args=(conn,))
                 thread.start()
 
 
