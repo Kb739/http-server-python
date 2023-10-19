@@ -134,7 +134,7 @@ def main():
         while True:
             conn, _ = server_socket.accept()  # wait for client
             with conn:
-                thread = threading.Thread(target=handle_request, args=(conn,))
+                thread = threading.Thread(target=handle_request, args=(conn))
                 thread.start()
 
 
