@@ -3,25 +3,36 @@ import socket
 
 
 class Request:
-    def __init__(self) -> None:
+    def __init__(self):
         self.method = "GET"
         self.url = "/"
+        self.header = dict({})
         self.body = ""
+
+    def __str__(self):
+        return f"Method={self.method}\n url={self.url}\n header={self.header}\nbody={self.body}"
 
 
 class Response:
-    def __init__(self, status="") -> None:
+    def __init__(self, status=""):
         self.status = status
         self.header = dict({})
         self.body = ""
 
 
 def parse_req(data):
-    data = data.decode()
     req = Request()
-    start_line = data.split("\r\n")[0].split(" ")
+    arr = data.decode().split("\r\n")
+    # setup start_line
+    start_line = arr[0].split(" ")
     req.method = start_line[0]
     req.url = start_line[1]
+    # setup headers
+    for i in range(1, len(arr) - 2):
+        key, value = arr[i].split(": ", 1)
+        req.header[key] = value
+    # body
+    req.body = arr[-1]
     return req
 
 
@@ -56,9 +67,9 @@ def get(route):
     return deco
 
 
-def post(route, fn):
+def post(route):
     def deco(func):
-        setup_route(route, fn, "POST")
+        setup_route(route, func, "POST")
 
     return deco
 
@@ -102,6 +113,13 @@ def fn(req, res):
         res.header["Content-Type"] = "text/plain"
     else:
         res.status = "404 Not Found"
+
+
+@get("/user-agent")
+def fn(req, res):
+    res.status = "200 OK"
+    res.body = req.header["User-Agent"]
+    res.header["Content-Type"] = "text/plain"
 
 
 def main():
