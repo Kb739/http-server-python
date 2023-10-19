@@ -76,24 +76,25 @@ def post(route):
 
 
 def handle_request(conn):
-    data = conn.recv(1024)
-    req = parse_req(data)
-    res = Response("404 Not Found")
-    m = method_map[req.method]
-    url = "*" + req.url.rstrip("/")
-    fn = m["abs"].get(url, m["rel"].get(url, None))
-    if fn == None:
-        for i in range(len(url) - 1, 0, -1):
-            if url[i] == "/":
-                fn = m["rel"].get(url[:i])
-                if fn != None:
-                    break
-                continue
-        if fn != None:
+    with conn:
+        data = conn.recv(4096)
+        req = parse_req(data)
+        res = Response("404 Not Found")
+        m = method_map[req.method]
+        url = "*" + req.url.rstrip("/")
+        fn = m["abs"].get(url, m["rel"].get(url, None))
+        if fn == None:
+            for i in range(len(url) - 1, 0, -1):
+                if url[i] == "/":
+                    fn = m["rel"].get(url[:i])
+                    if fn != None:
+                        break
+                    continue
+            if fn != None:
+                fn(req, res)
+        else:
             fn(req, res)
-    else:
-        fn(req, res)
-    conn.send(encode_res(res))
+        conn.send(encode_res(res))
 
 
 # setting up routes
@@ -130,12 +131,10 @@ def main():
     # Uncomment this to pass the first stage
     #
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
-    with server_socket:
-        while True:
-            conn, _ = server_socket.accept()  # wait for client
-            with conn:
-                thread = threading.Thread(target=handle_request, args=(conn))
-                thread.start()
+    while True:
+        conn, _ = server_socket.accept()  # wait for client
+        thread = threading.Thread(target=handle_request, args=(conn,))
+        thread.start()
 
 
 if __name__ == "__main__":
