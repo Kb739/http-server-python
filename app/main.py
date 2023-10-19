@@ -23,8 +23,8 @@ class Response:
 
 def parse_req(data):
     req = Request()
+    print(repr(data.decode()))
     arr = data.decode().split("\r\n")
-    print(arr)
     # setup start_line
     start_line = arr[0].split(" ")
     req.method = start_line[0]
