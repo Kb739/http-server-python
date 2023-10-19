@@ -23,7 +23,6 @@ class Response:
 
 def parse_req(data):
     req = Request()
-    print(repr(data.decode()))
     arr = data.decode().split("\r\n")
     # setup start_line
     start_line = arr[0].split(" ")
@@ -31,6 +30,8 @@ def parse_req(data):
     req.url = start_line[1]
     # setup headers
     for i in range(1, len(arr) - 2):
+        if not arr[i]:
+            break
         key, value = arr[i].split(": ", 1)
         req.header[key] = value
     # body
