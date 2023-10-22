@@ -101,51 +101,63 @@ def handle_request(conn):
         conn.send(encode_res(res))
 
 
-# setting up routes
-@get("/")
-def fn(req, res):
-    if req.url == "/":
-        res.status = "200 Ok"
-    else:
-        res.status = "404 Not Found"
-
-
-@get("/echo/")
-def fn(req, res):
-    arr = req.url.split("/", 2)
-    if len(arr) > 2:
-        res.status = "200 OK"
-        res.body = arr[2]
-        res.header["Content-Type"] = "text/plain"
-    else:
-        res.status = "404 Not Found"
-
-
-@get("/user-agent")
-def fn(req, res):
-    res.status = "200 OK"
-    res.body = req.header["User-Agent"]
-    res.header["Content-Type"] = "text/plain"
-
-
-@get("/files/")
-def fn(req, res):
-    parser = argparse.ArgumentParser()
-    parser.add_argument("--directory", help="absolute directory path")
-    args = parser.parse_args()
-    dir = args.directory
-    filename = req.url.split("/")[2]
-    path = os.path.join(dir, filename)
-    if os.path.isfile(path):
-        with open(path) as f:
-            res.body = f.read()
-            res.status = "200 OK"
-            res.header["Content-Type"] = "application/octet-stream"
-    else:
-        res.status = "404 Not Found"
-
 
 def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--directory", help="absolute directory path")
+    args = parser.parse_args()  
+    
+    # setting up routes
+    @get("/")
+    def fn(req, res):
+        if req.url == "/":
+            res.status = "200 Ok"
+        else:
+            res.status = "404 Not Found"
+
+
+    @get("/echo/")
+    def fn(req, res):
+        arr = req.url.split("/", 2)
+        if len(arr) > 2:
+            res.status = "200 OK"
+            res.body = arr[2]
+            res.header["Content-Type"] = "text/plain"
+        else:
+            res.status = "404 Not Found"
+
+
+    @get("/user-agent")
+    def fn(req, res):
+        res.status = "200 OK"
+        res.body = req.header["User-Agent"]
+        res.header["Content-Type"] = "text/plain"
+
+
+    @get("/files/")
+    def fn(req, res):
+        dir = args.directory
+        filename = req.url.split("/")[2]
+        path = os.path.join(dir, filename)
+        if os.path.isfile(path):
+            with open(path) as f:
+                res.body = f.read()
+                res.status = "200 OK"
+                res.header["Content-Type"] = "application/octet-stream"
+        else:
+            res.status = "404 Not Found"
+
+    @post("/files/")
+    def fn(req,res):
+        dir=args.directory
+        filename=req.url.split("/")[2]
+        path=os.path.join(dir,filename)
+        if os.path.isfile(path):
+            with open(path,"w") as f:
+                f.write(req.body)
+                res.status="201 Created"
+        else:
+            res.status="404 Not Found"
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!")
 
