@@ -157,6 +157,7 @@ def main():
                 f.write(req.body)
                 res.status="201 Created"
         else:
+            print(path)
             res.status="404 Not Found"
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!")
