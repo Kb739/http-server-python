@@ -38,7 +38,6 @@ def parse_req(data):
         req.header[key] = value
     # body
     req.body = arr[-1]
-    print(req)
     return req
 
 
@@ -138,7 +137,7 @@ def fn(req, res):
     filename = req.url.split("/")[2]
     path = os.path.join(dir, filename)
     if os.path.isfile(path):
-        with open(f"dir/filename") as f:
+        with open(path) as f:
             res.body = f.read()
             res.status = "200 OK"
             res.header["Content-Type"] = "application/octet-stream"
