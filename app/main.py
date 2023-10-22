@@ -38,6 +38,7 @@ def parse_req(data):
         req.header[key] = value
     # body
     req.body = arr[-1]
+    print(req)
     return req
 
 
