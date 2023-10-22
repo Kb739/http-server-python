@@ -101,12 +101,11 @@ def handle_request(conn):
         conn.send(encode_res(res))
 
 
-
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--directory", help="absolute directory path")
-    args = parser.parse_args()  
-    
+    args = parser.parse_args()
+
     # setting up routes
     @get("/")
     def fn(req, res):
@@ -114,7 +113,6 @@ def main():
             res.status = "200 Ok"
         else:
             res.status = "404 Not Found"
-
 
     @get("/echo/")
     def fn(req, res):
@@ -126,13 +124,11 @@ def main():
         else:
             res.status = "404 Not Found"
 
-
     @get("/user-agent")
     def fn(req, res):
         res.status = "200 OK"
         res.body = req.header["User-Agent"]
         res.header["Content-Type"] = "text/plain"
-
 
     @get("/files/")
     def fn(req, res):
@@ -148,17 +144,14 @@ def main():
             res.status = "404 Not Found"
 
     @post("/files/")
-    def fn(req,res):
-        dir=args.directory
-        filename=req.url.split("/")[2]
-        path=os.path.join(dir,filename)
-        if os.path.isfile(path):
-            with open(path,"w") as f:
+    def fn(req, res):
+        dir = args.directory
+        filename = req.url.split("/")[2]
+        path = os.path.join(dir, filename)
+        with open(path, "w") as f:
                 f.write(req.body)
-                res.status="201 Created"
-        else:
-            print(path)
-            res.status="404 Not Found"
+                res.status = "201 Created"
+
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!")
 
