@@ -1,6 +1,8 @@
 # Uncomment this to pass the first stage
 import socket
 import threading
+import argparse
+import os
 
 
 class Request:
@@ -126,12 +128,30 @@ def fn(req, res):
     res.header["Content-Type"] = "text/plain"
 
 
+@get("/files/")
+def fn(req, res):
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--directory", help="absolute directory path")
+    args = parser.parse_args()
+    dir = args.directory
+    filename = req.url.split("/")[2]
+    path = os.path.join(dir, filename)
+    if os.path.isfile(path):
+        with open(f"dir/filename") as f:
+            res.body = f.read()
+            res.status = "200 OK"
+            res.header["Content-Type"] = "application/octet-stream"
+    else:
+        res.status = "404 Not Found"
+
+
 def main():
     # You can use print statements as follows for debugging, they'll be visible when running tests.
     print("Logs from your program will appear here!")
 
     # Uncomment this to pass the first stage
     #
+
     server_socket = socket.create_server(("localhost", 4221), reuse_port=True)
     while True:
         conn, _ = server_socket.accept()  # wait for client
